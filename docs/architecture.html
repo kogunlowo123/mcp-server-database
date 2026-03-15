@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture - mcp-server-database</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b0c0b;color:#f5f2eb;font-family:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;line-height:1.6;padding:0}
+a{color:#c8420a;text-decoration:none}a:hover{text-decoration:underline}
+.container{max-width:1200px;margin:0 auto;padding:2rem}
+h1{font-size:2rem;color:#f5f2eb;margin-bottom:0.5rem}
+h2{font-size:1.4rem;color:#c8420a;margin:2rem 0 1rem;padding-bottom:0.5rem;border-bottom:1px solid #222}
+h3{font-size:1.1rem;color:#f5f2eb;margin:1.5rem 0 0.75rem}
+.badge{display:inline-block;padding:0.25rem 0.75rem;border-radius:4px;font-size:0.8rem;font-weight:600;margin-right:0.5rem;margin-bottom:0.5rem}
+.badge-lang{background:#1a3a1a;color:#4ade80;border:1px solid #2d5a2d}
+.badge-cat{background:#1a1a3a;color:#60a5fa;border:1px solid #2d2d5a}
+.badge-ver{background:#3a1a1a;color:#f87171;border:1px solid #5a2d2d}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:1rem 0}
+.card{background:#141514;border:1px solid #222;border-radius:8px;padding:1.25rem;text-align:center}
+.card-value{font-size:1.5rem;color:#c8420a;font-weight:700}
+.card-label{font-size:0.8rem;color:#888;margin-top:0.25rem}
+.arch-diagram{background:#101210;border:1px solid #222;border-radius:8px;padding:2rem;margin:1rem 0;overflow-x:auto}
+.flow-row{display:flex;justify-content:center;align-items:center;gap:0.5rem;margin:0.75rem 0;flex-wrap:wrap}
+.flow-box{background:#1a1a2e;border:2px solid #c8420a;border-radius:6px;padding:0.5rem 1rem;font-size:0.8rem;text-align:center;min-width:120px;color:#f5f2eb}
+.flow-box.accent{background:#c8420a;color:#fff;border-color:#e8520a}
+.flow-box.blue{border-color:#1982c4;background:#0f1f3a}
+.flow-box.green{border-color:#2b9348;background:#0f2a1a}
+.flow-box.purple{border-color:#533483;background:#1a0f2e}
+.flow-arrow{color:#c8420a;font-size:1.2rem;font-weight:bold}
+.flow-arrow-down{display:flex;justify-content:center;color:#c8420a;font-size:1.2rem;font-weight:bold}
+.flow-label{font-size:0.7rem;color:#888;display:block}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.85rem}
+th{background:#1a1a1a;color:#c8420a;padding:0.75rem;text-align:left;border-bottom:2px solid #333;white-space:nowrap}
+td{padding:0.75rem;border-bottom:1px solid #1a1a1a}
+tr:hover{background:#141514}
+code{background:#1a1a1a;padding:0.15rem 0.4rem;border-radius:3px;font-size:0.85rem;color:#e8a060}
+.checklist{list-style:none;padding:0}
+.checklist li{padding:0.4rem 0;padding-left:1.5rem;position:relative}
+.checklist li::before{content:'[ ]';position:absolute;left:0;color:#c8420a;font-weight:bold}
+.section-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
+.section-box{background:#141514;border:1px solid #222;border-radius:8px;padding:1.25rem}
+.section-box h3{margin-top:0}
+footer{margin-top:3rem;padding:1.5rem 0;border-top:1px solid #222;text-align:center;font-size:0.75rem;color:#555}
+.env-table td:first-child{color:#4ade80}
+.header-bar{background:#141514;border-bottom:1px solid #222;padding:1.5rem 0}
+.header-bar .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.industry-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.industry-card{background:#141514;border:1px solid #222;border-radius:8px;padding:1rem}
+.industry-card h4{color:#c8420a;margin-bottom:0.5rem;font-size:0.95rem}
+.industry-card p{font-size:0.8rem;color:#aaa}
+</style>
+</head>
+<body>
+
+<div class="header-bar">
+<div class="container">
+<div>
+<h1>mcp-server-database</h1>
+<p style="color:#888;margin-top:0.25rem">MCP server for relational database operations across PostgreSQL, MySQL, and SQLite</p>
+</div>
+<div>
+<span class="badge badge-lang">TypeScript 5.3+</span>
+<span class="badge badge-cat">MCP Server</span>
+<span class="badge badge-ver">v1.0.0</span>
+</div>
+</div>
+</div>
+
+<div class="container">
+
+<h2>Executive Summary</h2>
+<p>An MCP (Model Context Protocol) server that provides AI assistants with tools for interacting with relational databases. Supports PostgreSQL, MySQL, and SQLite through a unified interface. The server exposes six tools for querying, schema introspection, table listing, database discovery, migration execution, and full DDL export. Built with the official MCP SDK and driver-specific Node.js clients (pg, mysql2, better-sqlite3), it communicates via stdio transport for seamless integration with Claude Desktop and other MCP clients.</p>
+
+<h2>Overview</h2>
+<div class="cards">
+<div class="card"><div class="card-value">TypeScript</div><div class="card-label">Language</div></div>
+<div class="card"><div class="card-value">MCP Server</div><div class="card-label">Category</div></div>
+<div class="card"><div class="card-value">6</div><div class="card-label">Tools</div></div>
+<div class="card"><div class="card-value">3</div><div class="card-label">Database Engines</div></div>
+<div class="card"><div class="card-value">5</div><div class="card-label">Dependencies</div></div>
+<div class="card"><div class="card-value">MIT</div><div class="card-label">License</div></div>
+</div>
+
+<h2>Architecture Diagram</h2>
+<div class="arch-diagram">
+<div class="flow-row">
+<div class="flow-box accent">MCP Client<br><span class="flow-label">Claude Desktop / AI Assistant</span></div>
+</div>
+<div class="flow-arrow-down">v</div>
+<div class="flow-row">
+<div class="flow-box blue">stdio Transport<br><span class="flow-label">JSON-RPC over stdin/stdout</span></div>
+</div>
+<div class="flow-arrow-down">v</div>
+<div class="flow-row">
+<div class="flow-box accent">MCP Server Entry<br><span class="flow-label">src/index.ts</span></div>
+</div>
+<div class="flow-arrow-down">v</div>
+<div class="flow-row">
+<div class="flow-box purple">Connection Manager<br><span class="flow-label">src/connection.ts</span></div>
+</div>
+<div class="flow-label" style="text-align:center">Driver Selection Layer</div>
+<div class="flow-arrow-down">v</div>
+<div class="flow-row">
+<div class="flow-box green">query<br><span class="flow-label">Execute SQL</span></div>
+<div class="flow-box blue">list_tables<br><span class="flow-label">All Tables</span></div>
+<div class="flow-box purple">describe_table<br><span class="flow-label">Table Schema</span></div>
+</div>
+<div class="flow-row">
+<div class="flow-box green">list_databases<br><span class="flow-label">Server DBs</span></div>
+<div class="flow-box blue">execute_migration<br><span class="flow-label">Migration SQL</span></div>
+<div class="flow-box purple">get_schema<br><span class="flow-label">Full DDL</span></div>
+</div>
+<div class="flow-arrow-down">v</div>
+<div class="flow-row">
+<div class="flow-box accent">PostgreSQL<br><span class="flow-label">pg driver</span></div>
+<div class="flow-box blue">MySQL<br><span class="flow-label">mysql2 driver</span></div>
+<div class="flow-box green">SQLite<br><span class="flow-label">better-sqlite3</span></div>
+</div>
+</div>
+
+<h2>Component Breakdown</h2>
+<table>
+<thead><tr><th>Component</th><th>File</th><th>Purpose</th><th>Key Dependencies</th></tr></thead>
+<tbody>
+<tr><td>Server Entry</td><td><code>src/index.ts</code></td><td>MCP server initialization, tool registration, stdio transport</td><td>@modelcontextprotocol/sdk</td></tr>
+<tr><td>Connection Manager</td><td><code>src/connection.ts</code></td><td>Database driver selection and connection pooling based on DB_DRIVER</td><td>pg, mysql2, better-sqlite3</td></tr>
+<tr><td>Query</td><td><code>src/tools/query.ts</code></td><td>Execute SQL queries with parameterized inputs</td><td>Driver-specific clients</td></tr>
+<tr><td>List Tables</td><td><code>src/tools/list_tables.ts</code></td><td>List all tables in the connected database</td><td>information_schema queries</td></tr>
+<tr><td>Describe Table</td><td><code>src/tools/describe_table.ts</code></td><td>Return column names, types, and constraints for a table</td><td>information_schema queries</td></tr>
+<tr><td>List Databases</td><td><code>src/tools/list_databases.ts</code></td><td>List all databases on the server (PostgreSQL/MySQL only)</td><td>System catalog queries</td></tr>
+<tr><td>Execute Migration</td><td><code>src/tools/execute_migration.ts</code></td><td>Execute a migration SQL script against the database</td><td>Driver-specific clients</td></tr>
+<tr><td>Get Schema</td><td><code>src/tools/get_schema.ts</code></td><td>Export full database schema as DDL statements</td><td>information_schema / sqlite_master</td></tr>
+</tbody>
+</table>
+
+<h2>Data Flow / Request Flow</h2>
+<div class="section-box">
+<ol style="padding-left:1.5rem;color:#ccc">
+<li><strong>Client Request</strong> -- An MCP client sends a JSON-RPC tool invocation over stdio with the tool name and parameters.</li>
+<li><strong>Parameter Validation</strong> -- The server validates parameters using Zod schemas specific to each tool.</li>
+<li><strong>Driver Resolution</strong> -- The connection manager selects the appropriate database driver based on the DB_DRIVER environment variable.</li>
+<li><strong>Query Execution</strong> -- The tool handler executes the database operation using parameterized queries to prevent SQL injection.</li>
+<li><strong>Result Serialization</strong> -- Query results are serialized as structured JSON and returned to the MCP client.</li>
+</ol>
+</div>
+
+<h2>Security Controls</h2>
+<table>
+<thead><tr><th>Control</th><th>Implementation</th></tr></thead>
+<tbody>
+<tr><td>SQL Injection Prevention</td><td>Parameterized queries used for all user-supplied values</td></tr>
+<tr><td>Credential Management</td><td>Database credentials via environment variables; never logged</td></tr>
+<tr><td>Input Validation</td><td>Zod schema validation on all tool parameters</td></tr>
+<tr><td>Connection Security</td><td>TLS/SSL support for PostgreSQL and MySQL connections</td></tr>
+<tr><td>Migration Safety</td><td>execute_migration tool for controlled schema changes</td></tr>
+<tr><td>Least Privilege</td><td>Database user should have minimum required permissions for intended operations</td></tr>
+</tbody>
+</table>
+
+<h2>Industry Adaptation</h2>
+<div class="industry-grid">
+<div class="industry-card"><h4>Healthcare</h4><p>Query HIPAA-compliant databases with PHI access logging, schema introspection for EHR systems, migration management for healthcare data models.</p></div>
+<div class="industry-card"><h4>Finance</h4><p>Audit-ready SQL query execution for SOX compliance, schema documentation for financial systems, read-only access patterns for reporting.</p></div>
+<div class="industry-card"><h4>SaaS</h4><p>Multi-tenant database management, schema migrations across environments, database discovery for microservice architectures.</p></div>
+<div class="industry-card"><h4>DevOps</h4><p>Database schema validation in CI/CD, migration execution as part of deployment pipelines, cross-database schema comparison.</p></div>
+</div>
+
+<h2>Production Readiness Checklist</h2>
+<ul class="checklist">
+<li>Configure database driver and connection credentials via environment variables</li>
+<li>Create a dedicated database user with minimum required permissions</li>
+<li>Enable TLS/SSL for PostgreSQL and MySQL connections</li>
+<li>Build TypeScript to JavaScript (<code>npm run build</code>)</li>
+<li>Test all six tools against target database</li>
+<li>Configure MCP client with server entry point and database environment</li>
+<li>Set up database audit logging for query tracking</li>
+<li>Deploy as Docker container for production use</li>
+</ul>
+
+<h2>Configuration / Environment Variables</h2>
+<table class="env-table">
+<thead><tr><th>Variable</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>DB_DRIVER</code></td><td>Yes</td><td>--</td><td>Database driver: postgres, mysql, or sqlite</td></tr>
+<tr><td><code>DB_HOST</code></td><td>Yes*</td><td>--</td><td>Database host (* required for postgres/mysql)</td></tr>
+<tr><td><code>DB_PORT</code></td><td>No</td><td>5432/3306</td><td>Database port</td></tr>
+<tr><td><code>DB_USER</code></td><td>Yes*</td><td>--</td><td>Database username</td></tr>
+<tr><td><code>DB_PASSWORD</code></td><td>Yes*</td><td>--</td><td>Database password</td></tr>
+<tr><td><code>DB_NAME</code></td><td>Yes</td><td>--</td><td>Database name</td></tr>
+<tr><td><code>DB_PATH</code></td><td>Yes*</td><td>--</td><td>Path to SQLite file (* required for sqlite)</td></tr>
+</tbody>
+</table>
+
+<h2>Deployment</h2>
+<div class="section-grid">
+<div class="section-box">
+<h3>Local Development</h3>
+<pre><code>git clone https://github.com/kogunlowo123/mcp-server-database.git
+cd mcp-server-database
+npm install
+npm run build
+DB_DRIVER=postgres DB_HOST=localhost \
+  DB_USER=admin DB_PASSWORD=secret \
+  DB_NAME=mydb npm start</code></pre>
+</div>
+<div class="section-box">
+<h3>Docker / Production</h3>
+<pre><code>docker build -t mcp-server-database .
+docker run \
+  -e DB_DRIVER=postgres \
+  -e DB_HOST=host.docker.internal \
+  -e DB_USER=admin \
+  -e DB_PASSWORD=secret \
+  -e DB_NAME=mydb \
+  mcp-server-database</code></pre>
+</div>
+</div>
+
+<h2>Links</h2>
+<table>
+<tbody>
+<tr><td>Repository</td><td><a href="https://github.com/kogunlowo123/mcp-server-database">github.com/kogunlowo123/mcp-server-database</a></td></tr>
+<tr><td>README</td><td><a href="../README.md">README.md</a></td></tr>
+<tr><td>Changelog</td><td><a href="../CHANGELOG.md">CHANGELOG.md</a></td></tr>
+<tr><td>License</td><td><a href="../LICENSE">MIT License</a></td></tr>
+</tbody>
+</table>
+
+<footer>
+Generated on 2026-03-15 | mcp-server-database v1.0.0 | Architecture Documentation
+</footer>
+
+</div>
+</body>
+</html>
